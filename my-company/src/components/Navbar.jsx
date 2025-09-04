@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 function Navbar() {
-  const navStyle = { padding: "1rem", backgroundColor: "#333", color: "white", display: "flex", gap: "1rem" };
+  const navStyle = { padding: "1rem", backgroundColor: "#333", color: "white", display: "flex", gap: "1rem" , justifyContent: "space-around"};
   const linkStyle = { color: "white", textDecoration: "none" };
 
   return (
