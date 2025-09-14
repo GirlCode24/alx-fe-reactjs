@@ -22,13 +22,13 @@ const EditRecipeForm = ({ recipeId, onDone }) => {
     return <p>Recipe not found.</p>;
   }
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = (event) => {
+    event.preventDefault();
     if (!title.trim() || !description.trim()) return;
 
     updateRecipe({ id: recipe.id, title: title.trim(), description: description.trim() });
     if (onDone) onDone();
-    // optionally navigate back to detail page (already on it)
+ 
     navigate(`/recipes/${recipe.id}`);
   };
 
