@@ -7,6 +7,7 @@ function Home() {
   return (
     <div style={{ maxWidth: 800, margin: '0 auto', padding: 20 }}>
       <h1>My Recipe App</h1>
+      <SearchBar /> {/* 🔎 Add search bar */}
       <AddRecipeForm />
       <hr style={{ margin: '20px 0' }} />
       <RecipeList />
