@@ -1,88 +1,94 @@
+// src/components/Search.jsx
 import { useState } from "react";
 import axios from "axios";
 
 function Search() {
-  const [username, setUsername] = useState("");
+  const [query, setQuery] = useState("");
   const [location, setLocation] = useState("");
-  const [results, setResults] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSearch = async (e) => {
     e.preventDefault();
-
-    // Build GitHub search query
-    let query = username ? `${username} in:login` : "";
-    if (location) {
-      query += ` location:${location}`;
-    }
+    setLoading(true);
+    setError("");
+    setUsers([]);
 
     try {
-      const res = await axios.get(
-        `https://api.github.com/search/users?q=${query}`
+      // Build GitHub search query
+      let q = query;
+      if (location) q += `+location:${location}`;
+
+      const response = await axios.get(
+        `https://api.github.com/search/users?q=${q}`
       );
-      setResults(res.data.items || []);
+
+      setUsers(response.data.items);
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error(error); 
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="w-full max-w-lg mx-auto">
-      <form
-        onSubmit={handleSearch}
-        className="flex flex-col gap-4 bg-gray-800 p-6 rounded-lg shadow-lg"
-      >
-        {/* Username */}
+    <div className="w-full max-w-xl p-6 bg-gray-800 rounded-lg shadow-lg">
+      <form onSubmit={handleSearch} className="space-y-4">
         <input
           type="text"
-          placeholder="Search by username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          className="p-2 rounded bg-gray-700 text-white focus:outline-none"
+          placeholder="Search by username..."
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          className="w-full px-4 py-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-
-        {/* Location */}
         <input
           type="text"
-          placeholder="Filter by location (e.g. Ghana)"
+          placeholder="Filter by location (optional)..."
           value={location}
           onChange={(e) => setLocation(e.target.value)}
-          className="p-2 rounded bg-gray-700 text-white focus:outline-none"
+          className="w-full px-4 py-2 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-
         <button
           type="submit"
-          className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded font-bold"
+          disabled={loading}
+          className="w-full py-2 bg-blue-600 hover:bg-blue-700 rounded text-white font-semibold"
         >
-          Search
+          {loading ? "Searching..." : "Search"}
         </button>
       </form>
 
-      {/* Results */}
-      <div className="mt-6">
-        {results.length > 0 ? (
-          <ul className="space-y-4">
-            {results.map((user) => (
-              <li key={user.id} className="flex items-center gap-4 bg-gray-700 p-4 rounded">
-                <img
-                  src={user.avatar_url}
-                  alt={user.login}
-                  className="w-12 h-12 rounded-full"
-                />
+      {error && (
+        <p className="mt-4 text-red-400 font-semibold text-center">{error}</p>
+      )}
+
+      {users.length > 0 && (
+        <ul className="mt-6 space-y-4">
+          {users.map((user) => (
+            <li
+              key={user.id}
+              className="flex items-center gap-4 p-4 bg-gray-700 rounded-lg"
+            >
+              <img
+                src={user.avatar_url}
+                alt={user.login}
+                className="w-12 h-12 rounded-full"
+              />
+              <div>
                 <a
                   href={user.html_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-400 hover:underline"
+                  className="text-blue-400 font-bold hover:underline"
                 >
                   {user.login}
                 </a>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-gray-400">No results yet.</p>
-        )}
-      </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
