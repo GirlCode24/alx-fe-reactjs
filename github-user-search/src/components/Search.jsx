@@ -9,6 +9,18 @@ function Search() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // Fetch user data 
+  const fetchUserData = async (username) => {
+    try {
+      const response = await axios.get(`https://api.github.com/users/${username}`);
+      return response.data;
+    } catch (err) {
+      console.error("Failed to fetch user data:", err);
+      return null;
+    }
+  };
+
+  // Handle form submit
   const handleSearch = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -16,7 +28,7 @@ function Search() {
     setUsers([]);
 
     try {
-      // Build GitHub search query
+      // Build query for GitHub API
       let q = query;
       if (location) q += `+location:${location}`;
 
@@ -24,17 +36,34 @@ function Search() {
         `https://api.github.com/search/users?q=${q}`
       );
 
-      setUsers(response.data.items);
-    } catch (error) {
-      console.error(error); 
-      setError("Something went wrong. Please try again.");
+      if (response.data && response.data.items) {
+        // Fetch extra details for each user
+        const detailedUsers = await Promise.all(
+          response.data.items.map(async (user) => {
+            const details = await fetchUserData(user.login);
+            return { ...user, ...details };
+          })
+        );
+
+        setUsers(detailedUsers);
+      } else {
+        setError("No users found.");
+      }
+    } catch (err) {
+      console.error("GitHub API error:", err);
+      if (err.response) {
+        setError(`GitHub Error: ${err.response.status} - ${err.response.data.message}`);
+      } else {
+        setError("Something went wrong. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="w-full max-w-xl p-6 bg-gray-800 rounded-lg shadow-lg">
+    <div className="w-full max-w-xl p-6 bg-gray-800 rounded-lg shadow-lg mx-auto mt-8">
+      {/* Search form */}
       <form onSubmit={handleSearch} className="space-y-4">
         <input
           type="text"
@@ -59,10 +88,12 @@ function Search() {
         </button>
       </form>
 
+      {/* Error message */}
       {error && (
         <p className="mt-4 text-red-400 font-semibold text-center">{error}</p>
       )}
 
+      {/* Results */}
       {users.length > 0 && (
         <ul className="mt-6 space-y-4">
           {users.map((user) => (
@@ -84,6 +115,12 @@ function Search() {
                 >
                   {user.login}
                 </a>
+                {user.location && (
+                  <p className="text-gray-300 text-sm">📍 {user.location}</p>
+                )}
+                <p className="text-gray-400 text-sm">
+                  Repos: {user.public_repos ?? "N/A"}
+                </p>
               </div>
             </li>
           ))}
