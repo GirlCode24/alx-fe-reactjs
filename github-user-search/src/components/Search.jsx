@@ -1,82 +1,90 @@
 import { useState } from "react";
 import axios from "axios";
 
-export default function Search() {
-  const [query, setQuery] = useState("");
-  const [user, setUser] = useState(null);
-  const [repos, setRepos] = useState([]);
+function Search() {
+  const [username, setUsername] = useState("");
+  const [location, setLocation] = useState("");
+  const [results, setResults] = useState([]);
 
   const handleSearch = async (e) => {
     e.preventDefault();
 
-    if (!query) return;
+    // Build GitHub search query
+    let query = username ? `${username} in:login` : "";
+    if (location) {
+      query += ` location:${location}`;
+    }
 
     try {
-      // fetch user info
-      const userRes = await axios.get(`https://api.github.com/users/${query}`);
-      setUser(userRes.data);
-
-      // fetch repos
-      const repoRes = await axios.get(`https://api.github.com/users/${query}/repos`);
-      setRepos(repoRes.data);
-    } catch (err) {
-      console.error(err);
-      setUser(null);
-      setRepos([]);
+      const res = await axios.get(
+        `https://api.github.com/search/users?q=${query}`
+      );
+      setResults(res.data.items || []);
+    } catch (error) {
+      console.error("Error fetching data:", error);
     }
   };
 
   return (
-    <div className="p-4 max-w-xl mx-auto">
-      <form onSubmit={handleSearch} className="flex gap-2">
+    <div className="w-full max-w-lg mx-auto">
+      <form
+        onSubmit={handleSearch}
+        className="flex flex-col gap-4 bg-gray-800 p-6 rounded-lg shadow-lg"
+      >
+        {/* Username */}
         <input
           type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search GitHub user..."
-          className="border rounded px-3 py-2 w-full"
+          placeholder="Search by username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          className="p-2 rounded bg-gray-700 text-white focus:outline-none"
         />
+
+        {/* Location */}
+        <input
+          type="text"
+          placeholder="Filter by location (e.g. Ghana)"
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+          className="p-2 rounded bg-gray-700 text-white focus:outline-none"
+        />
+
         <button
           type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded"
+          className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded font-bold"
         >
           Search
         </button>
       </form>
 
-      {/* Conditional rendering with && */}
-      {user && (
-        <div className="mt-6 p-4 border rounded shadow">
-          <h2 className="text-xl font-bold">{user.login}</h2>
-          <img
-            src={user.avatar_url}
-            alt={user.login}
-            className="w-24 h-24 rounded-full my-2"
-          />
-          <p>{user.bio}</p>
-        </div>
-      )}
-
-      {/* Using .map() */}
-      {repos.length > 0 && (
-        <div className="mt-6">
-          <h3 className="font-semibold mb-2">Repositories:</h3>
-          <ul className="list-disc pl-6">
-            {repos.map((repo) => (
-              <li key={repo.id}>
+      {/* Results */}
+      <div className="mt-6">
+        {results.length > 0 ? (
+          <ul className="space-y-4">
+            {results.map((user) => (
+              <li key={user.id} className="flex items-center gap-4 bg-gray-700 p-4 rounded">
+                <img
+                  src={user.avatar_url}
+                  alt={user.login}
+                  className="w-12 h-12 rounded-full"
+                />
                 <a
-                  href={repo.html_url}
+                  href={user.html_url}
                   target="_blank"
-                  rel="noreferrer"
-                  className="text-blue-500 hover:underline"
+                  rel="noopener noreferrer"
+                  className="text-blue-400 hover:underline"
                 >
-                  {repo.name}
+                  {user.login}
                 </a>
               </li>
             ))}
           </ul>
-        </div>
-      )}
+        ) : (
+          <p className="text-gray-400">No results yet.</p>
+        )}
+      </div>
     </div>
   );
 }
+
+export default Search;
