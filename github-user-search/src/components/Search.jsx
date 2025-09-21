@@ -1,4 +1,4 @@
-// src/components/Search.jsx
+
 import { useState } from "react";
 import axios from "axios";
 
@@ -46,7 +46,7 @@ function Search() {
         );
         setUsers(detailedUsers);
       } else {
-        setError("No users found.");
+        setError("Looks like we cant find the user"); // ✅ fixed wording
       }
     } catch (err) {
       console.error("GitHub API error:", err);

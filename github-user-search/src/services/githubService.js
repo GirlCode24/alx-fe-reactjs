@@ -28,6 +28,6 @@ export async function searchUsers({ username, location, minRepos }) {
     return response.data.items;
   } catch (error) {
     console.error("searchUsers failed:", error);
-    return []; // ⬅️ safely return empty list
+    return []; 
   }
 }
