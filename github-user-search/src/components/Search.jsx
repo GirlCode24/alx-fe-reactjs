@@ -9,18 +9,18 @@ function Search() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Fetch user data 
+  // Fetch additional details for a single user
   const fetchUserData = async (username) => {
     try {
-      const response = await axios.get(`https://api.github.com/users/${username}`);
-      return response.data;
+      const { data } = await axios.get(`https://api.github.com/users/${username}`);
+      return data;
     } catch (err) {
       console.error("Failed to fetch user data:", err);
       return null;
     }
   };
 
-  // Handle form submit
+  // Handle search submit
   const handleSearch = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -28,23 +28,22 @@ function Search() {
     setUsers([]);
 
     try {
-      // Build query for GitHub API
-      let q = query;
-      if (location) q += `+location:${location}`;
+      // Build query string
+      let q = query.trim();
+      if (location.trim()) q += `+location:${location.trim()}`;
 
-      const response = await axios.get(
+      const { data } = await axios.get(
         `https://api.github.com/search/users?q=${q}`
       );
 
-      if (response.data && response.data.items) {
-        // Fetch extra details for each user
+      if (data?.items?.length) {
+        // Get detailed info for each user
         const detailedUsers = await Promise.all(
-          response.data.items.map(async (user) => {
+          data.items.map(async (user) => {
             const details = await fetchUserData(user.login);
             return { ...user, ...details };
           })
         );
-
         setUsers(detailedUsers);
       } else {
         setError("No users found.");
@@ -63,7 +62,7 @@ function Search() {
 
   return (
     <div className="w-full max-w-xl p-6 bg-gray-800 rounded-lg shadow-lg mx-auto mt-8">
-      {/* Search form */}
+      {/* Search Form */}
       <form onSubmit={handleSearch} className="space-y-4">
         <input
           type="text"
@@ -88,10 +87,8 @@ function Search() {
         </button>
       </form>
 
-      {/* Error message */}
-      {error && (
-        <p className="mt-4 text-red-400 font-semibold text-center">{error}</p>
-      )}
+      {/* Error Message */}
+      {error && <p className="mt-4 text-red-400 font-semibold text-center">{error}</p>}
 
       {/* Results */}
       {users.length > 0 && (
