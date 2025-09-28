@@ -1,19 +1,7 @@
 import axios from "axios";
 
-const BASE_URL = "https://api.github.com";
+const SEARCH_USERS_URL = "https://api.github.com/search/users?q=";
 
-// Fetch a single user's details
-export async function fetchUserData(username) {
-  try {
-    const response = await axios.get(`${BASE_URL}/users/${username}`);
-    return response.data;
-  } catch (error) {
-    console.error("fetchUserData failed:", error);
-    return null; // ⬅️ safely return null
-  }
-}
-
-// Search users by username, location, and min repos
 export async function searchUsers({ username, location, minRepos }) {
   let query = "";
 
@@ -23,11 +11,11 @@ export async function searchUsers({ username, location, minRepos }) {
 
   try {
     const response = await axios.get(
-      `${BASE_URL}/search/users?q=${encodeURIComponent(query)}`
+      `${SEARCH_USERS_URL}${encodeURIComponent(query)}`
     );
     return response.data.items;
   } catch (error) {
     console.error("searchUsers failed:", error);
-    return []; 
+    return [];
   }
 }
