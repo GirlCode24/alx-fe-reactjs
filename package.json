@@ -3,12 +3,13 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
-  },
+"scripts": {
+  "dev": "vite",
+  "build": "vite build",
+  "lint": "eslint .",
+  "tailwind:init": "node node_modules/tailwindcss/lib/cli.js init -p",
+  "preview": "vite preview"
+},
   "dependencies": {
     "axios": "^1.12.2",
     "react": "^19.1.1",
