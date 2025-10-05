@@ -1,16 +1,14 @@
 
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import recipeData from "../data.json"; 
 
 const HomePage = () => {
   const [recipes, setRecipes] = useState([]);
 
-  useEffect(() => {
-    fetch("/data.json")
-      .then((res) => res.json())
-      .then((data) => setRecipes(data))
-      .catch((err) => console.error("Error loading recipes:", err));
-  }, []);
+useEffect(() => {
+  setRecipes(recipeData);
+}, []);
   
   return (
     <div className="p-6">

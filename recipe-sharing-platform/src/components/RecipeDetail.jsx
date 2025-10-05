@@ -1,23 +1,13 @@
-
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useParams, Link } from "react-router-dom";
+import recipeData from "../data.json";
 
 const RecipeDetail = () => {
   const { id } = useParams();
-  const [recipe, setRecipe] = useState(null);
-
-  useEffect(() => {
-    fetch("/data.json")
-      .then((res) => res.json())
-      .then((data) => {
-        const found = data.find((item) => item.id === parseInt(id));
-        setRecipe(found);
-      })
-      .catch((err) => console.error("Error loading recipe:", err));
-  }, [id]);
+  const recipe = recipeData.find((r) => r.id === parseInt(id));
 
   if (!recipe) {
-    return <p className="text-center mt-10">Loading recipe...</p>;
+    return <p className="text-center mt-10">Recipe not found.</p>;
   }
 
   return (
@@ -37,24 +27,28 @@ const RecipeDetail = () => {
           <p className="text-gray-700 mb-6">{recipe.summary}</p>
 
           {/* Ingredients */}
-          <div className="mb-6">
-            <h2 className="text-2xl font-semibold mb-2">Ingredients</h2>
-            <ul className="list-disc list-inside text-gray-600">
-              {recipe.ingredients?.map((ingredient, index) => (
-                <li key={index}>{ingredient}</li>
-              ))}
-            </ul>
-          </div>
+          {recipe.ingredients && (
+            <div className="mb-6">
+              <h2 className="text-2xl font-semibold mb-2">Ingredients</h2>
+              <ul className="list-disc list-inside text-gray-600">
+                {recipe.ingredients.map((ingredient, index) => (
+                  <li key={index}>{ingredient}</li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {/* Instructions */}
-          <div>
-            <h2 className="text-2xl font-semibold mb-2">Instructions</h2>
-            <ol className="list-decimal list-inside text-gray-600 space-y-2">
-              {recipe.instructions?.map((step, index) => (
-                <li key={index}>{step}</li>
-              ))}
-            </ol>
-          </div>
+          {recipe.instructions && (
+            <div>
+              <h2 className="text-2xl font-semibold mb-2">Instructions</h2>
+              <ol className="list-decimal list-inside text-gray-600 space-y-2">
+                {recipe.instructions.map((step, index) => (
+                  <li key={index}>{step}</li>
+                ))}
+              </ol>
+            </div>
+          )}
         </div>
       </div>
     </div>
