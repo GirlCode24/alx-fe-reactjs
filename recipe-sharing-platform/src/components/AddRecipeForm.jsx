@@ -7,32 +7,32 @@ const AddRecipeForm = ({ onAddRecipe }) => {
   const [ingredients, setIngredients] = useState("");
   const [steps, setSteps] = useState("");
   const [image, setImage] = useState("");
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState({});
 
   const navigate = useNavigate();
 
+  const validate = () => {
+    const newErrors = {};
+
+    if (!title.trim()) newErrors.title = "Title is required.";
+    if (!summary.trim()) newErrors.summary = "Summary is required.";
+    if (!image.trim()) newErrors.image = "Image URL is required.";
+    if (!ingredients.trim()) newErrors.ingredients = "Ingredients are required.";
+    else if (ingredients.split(",").length < 2)
+      newErrors.ingredients = "Include at least 2 ingredients.";
+    if (!steps.trim()) newErrors.steps = "Instructions are required.";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!validate()) return;
 
-    // Basic validation
-    if (!title.trim() || !summary.trim() || !ingredients.trim() || !steps.trim() || !image.trim()) {
-      setError("All fields are required.");
-      return;
-    }
-
-    // Extra check: at least 2 ingredients
     const ingredientsArray = ingredients.split(",").map((i) => i.trim());
-    if (ingredientsArray.length < 2) {
-      setError("Please include at least 2 ingredients (comma separated).");
-      return;
-    }
+    const stepsArray = steps.split("\n").map((s) => s.trim()).filter(Boolean);
 
-    // Steps → array (split by new lines)
-    const stepsArray = steps.split("\n").map((s) => s.trim()).filter((s) => s);
-
-    setError("");
-
-    // Build new recipe object (matches JSON structure!)
     const newRecipe = {
       id: Date.now(),
       title,
@@ -42,25 +42,22 @@ const AddRecipeForm = ({ onAddRecipe }) => {
       instructions: stepsArray,
     };
 
-    if (onAddRecipe) {
-      onAddRecipe(newRecipe);
-    }
+    if (onAddRecipe) onAddRecipe(newRecipe);
 
     // Reset form
     setTitle("");
     setSummary("");
+    setImage("");
     setIngredients("");
     setSteps("");
-    setImage("");
+    setErrors({});
 
-    // Redirect back home
     navigate("/");
   };
 
   return (
     <div className="max-w-xl mx-auto p-6 bg-white shadow-md rounded-lg">
       <h2 className="text-2xl font-semibold mb-4 text-center">Add a New Recipe</h2>
-      {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Title */}
@@ -73,6 +70,7 @@ const AddRecipeForm = ({ onAddRecipe }) => {
             onChange={(e) => setTitle(e.target.value)}
             placeholder="e.g. Chocolate Cake"
           />
+          {errors.title && <p className="text-red-500 text-sm">{errors.title}</p>}
         </div>
 
         {/* Summary */}
@@ -85,9 +83,10 @@ const AddRecipeForm = ({ onAddRecipe }) => {
             onChange={(e) => setSummary(e.target.value)}
             placeholder="A short description of the recipe"
           ></textarea>
+          {errors.summary && <p className="text-red-500 text-sm">{errors.summary}</p>}
         </div>
 
-        {/* Image URL */}
+        {/* Image */}
         <div>
           <label className="block text-gray-700 font-medium mb-1">Image URL</label>
           <input
@@ -97,6 +96,7 @@ const AddRecipeForm = ({ onAddRecipe }) => {
             onChange={(e) => setImage(e.target.value)}
             placeholder="https://example.com/recipe.jpg"
           />
+          {errors.image && <p className="text-red-500 text-sm">{errors.image}</p>}
         </div>
 
         {/* Ingredients */}
@@ -109,6 +109,7 @@ const AddRecipeForm = ({ onAddRecipe }) => {
             onChange={(e) => setIngredients(e.target.value)}
             placeholder="List ingredients, separated by commas"
           ></textarea>
+          {errors.ingredients && <p className="text-red-500 text-sm">{errors.ingredients}</p>}
         </div>
 
         {/* Steps */}
@@ -121,6 +122,7 @@ const AddRecipeForm = ({ onAddRecipe }) => {
             onChange={(e) => setSteps(e.target.value)}
             placeholder="Write each step on a new line"
           ></textarea>
+          {errors.steps && <p className="text-red-500 text-sm">{errors.steps}</p>}
         </div>
 
         {/* Submit */}
