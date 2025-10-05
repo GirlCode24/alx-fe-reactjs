@@ -1,5 +1,6 @@
-// src/components/HomePage.jsx
+
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 
 const HomePage = () => {
   const [recipes, setRecipes] = useState([]);
@@ -10,7 +11,7 @@ const HomePage = () => {
       .then((data) => setRecipes(data))
       .catch((err) => console.error("Error loading recipes:", err));
   }, []);
-
+  
   return (
     <div className="p-6">
       <h1 className="text-3xl font-bold mb-6 text-center">Recipe Sharing Platform</h1>
@@ -28,9 +29,12 @@ const HomePage = () => {
             <div className="p-4">
               <h2 className="text-xl font-semibold mb-2">{recipe.title}</h2>
               <p className="text-gray-600">{recipe.summary}</p>
-              <button className="mt-3 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-                View Recipe
-              </button>
+              
+              <Link to={`/recipe/${recipe.id}`}>
+  <button className="mt-3 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+    View Recipe
+  </button>
+</Link>
             </div>
           </div>
         ))}
