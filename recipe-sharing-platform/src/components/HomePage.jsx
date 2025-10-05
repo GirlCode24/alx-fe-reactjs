@@ -1,6 +1,14 @@
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import recipeData from "../data.json"; 
 
-const HomePage = ({ recipes }) => {
+const HomePage = () => {
+  const [recipes, setRecipes] = useState([]);
+
+  useEffect(() => {
+    setRecipes(recipeData); 
+  }, []);
+
   return (
     <div className="p-6">
       <h1 className="text-3xl font-bold mb-6 text-center">Recipe Sharing Platform</h1>
