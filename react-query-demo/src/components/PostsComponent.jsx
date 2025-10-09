@@ -1,7 +1,6 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 
-//Function to fetch data
 const fetchPosts = async () => {
   const response = await fetch("https://jsonplaceholder.typicode.com/posts");
   if (!response.ok) {
@@ -11,7 +10,7 @@ const fetchPosts = async () => {
 };
 
 function PostsComponent() {
-  // Using React Query’s useQuery hook
+
   const {
     data: posts,
     error,
@@ -20,16 +19,19 @@ function PostsComponent() {
     refetch,
     isFetching,
   } = useQuery({
-    queryKey: ["posts"], 
+    queryKey: ["posts"],
     queryFn: fetchPosts,
-    staleTime: 60000,
+
+
+    cacheTime: 1000 * 60 * 5, 
+    staleTime: 1000 * 60,
+    refetchOnWindowFocus: false,
+    keepPreviousData: true, 
   });
 
-  
   if (isLoading) return <p>Loading posts...</p>;
   if (isError) return <p>Error: {error.message}</p>;
 
- 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       <h1 className="text-2xl font-bold mb-4 text-center">Posts List</h1>
