@@ -1,19 +1,32 @@
 import React from "react";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Routes, Route } from "react-router-dom";
+import ProfileDetails from "../pages/ProfileDetails";
+import ProfileSettings from "../pages/ProfileSettings";
 
-function Profile() {
+const Profile = () => {
   return (
-    <div style={{ padding: 20 }}>
-      <h1>User Profile</h1>
+    <div>
+      <h1>Profile Page</h1>
+
+      {/* Navigation for nested routes */}
       <nav>
-        <Link to="details">Profile Details</Link> |{" "}
-        <Link to="settings">Profile Settings</Link>
+        <ul>
+          <li>
+            <Link to="details">Profile Details</Link>
+          </li>
+          <li>
+            <Link to="settings">Profile Settings</Link>
+          </li>
+        </ul>
       </nav>
 
-      {}
-      <Outlet />
+      {/* Nested Routes inside Profile */}
+      <Routes>
+        <Route path="details" element={<ProfileDetails />} />
+        <Route path="settings" element={<ProfileSettings />} />
+      </Routes>
     </div>
   );
-}
+};
 
 export default Profile;
