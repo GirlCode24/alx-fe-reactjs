@@ -1,13 +1,7 @@
 import React from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
-
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
-import Profile from "./components/Profile";
+import Profile from "./pages/Profile";
 import BlogPost from "./pages/BlogPost";
 import Login from "./pages/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -34,11 +28,10 @@ function App() {
           <Route path="settings" element={<ProfileSettings />} />
         </Route>
 
-        {/* Login page */}
         <Route path="/login" element={<Login />} />
 
-        {/* Dynamic route for blog posts */}
-        <Route path="/blog/:postId" element={<BlogPost />} />
+        {/*  Dynamic route for blog posts */}
+        <Route path="/blog/:id" element={<BlogPost />} />
 
         {/* Fallback route */}
         <Route path="*" element={<Navigate to="/" replace />} />
